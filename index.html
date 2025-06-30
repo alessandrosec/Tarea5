@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask + MongoDB - Gestión de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            background: #007bff;
+            padding: 15px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        .navbar button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .navbar button:hover, .navbar button.active {
+            background: rgba(255,255,255,0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+        }
+        .empty {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row > div {
+            flex: 1;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <button onclick="mostrarSeccion('inicio')" id="btn-inicio" class="active">🏠 Inicio</button>
+            <button onclick="mostrarSeccion('test')" id="btn-test">🔗 Test Conexión</button>
+            <button onclick="mostrarSeccion('ejercicio17')" id="btn-ejercicio17">➕ Ejercicio 17</button>
+            <button onclick="mostrarSeccion('ejercicio18')" id="btn-ejercicio18">🔒 Ejercicio 18</button>
+            <button onclick="mostrarSeccion('ejercicio19')" id="btn-ejercicio19">📋 Ejercicio 19</button>
+            <button onclick="mostrarSeccion('gestion')" id="btn-gestion">👥 Gestión Usuarios</button>
+        </nav>
+
+        <!-- SECCIÓN INICIO -->
+        <div id="inicio" class="section active">
+            <h1>🚀 Flask + MongoDB - Gestión de Usuarios</h1>
+            
+            <div class="info result">
+                <h3>📚 Ejercicios de MongoDB con Python y Flask</h3>
+                <p>Esta aplicación demuestra la gestión de usuarios en MongoDB con diferentes niveles de privilegios.</p>
+            </div>
+
+            <div class="form-row">
+                <div class="card">
+                    <h3>🔧 Configuración</h3>
+                    <button onclick="mostrarSeccion('test')" class="btn-secondary">🔗 Probar Conexiones</button>
+                    <p>Verifica que todas las conexiones a MongoDB funcionen correctamente.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>📝 Ejercicio 17: Insertar Datos</h3>
+                    <button onclick="mostrarSeccion('ejercicio17')" class="btn-success">➕ Insertar Productos</button>
+                    <p>Aprende a insertar documentos usando Flask y PyMongo.</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="card">
+                    <h3>🔒 Ejercicio 18: Error de Privilegios</h3>
+                    <button onclick="mostrarSeccion('ejercicio18')" class="btn-danger">🔒 Verificar Permisos</button>
+                    <p>Simula errores de permisos cambiando roles de usuario.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>📋 Ejercicio 19: Consultar Datos</h3>
+                    <button onclick="mostrarSeccion('ejercicio19')" class="btn-success">📋 Listar Productos</button>
+                    <p>Obtén y visualiza datos desde MongoDB.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>👥 Gestión Completa de Usuarios</h3>
+                <button onclick="mostrarSeccion('gestion')">👥 Ir a Gestión de Usuarios</button>
+                <p>Aplicación completa con formularios y gestión de usuarios en la base de datos gestionUsuarios.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN TEST CONEXIÓN -->
+        <div id="test" class="section">
+            <h1>🔗 Test de Conexiones</h1>
+            <button onclick="probarConexiones()" class="btn-success">Probar Todas las Conexiones</button>
+            <div id="resultado-test"></div>
+        </div>
+
+        <!-- SECCIÓN EJERCICIO 17 -->
+        <div id="ejercicio17" class="section">
+            <h1>➕ Ejercicio 17: Insertar Productos</h1>
+            <div class="info result">
+                <p><strong>Objetivo:</strong> Insertar productos en la base de datos 'inventario' usando el usuario 'usuario_rw' con permisos readWrite.</p>
+            </div>
+            
+            <form id="form-producto">
+                <div class="form-row">
+                    <div>
+                        <input type="text" id="nombre-producto" placeholder="Nombre del producto" required>
+                    </div>
+                    <div>
+                        <input type="number" id="precio-producto" placeholder="Precio" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <input type="number" id="stock-producto" placeholder="Stock" required>
+                    </div>
+                    <div>
+                        <input type="text" id="categoria-producto" placeholder="Categoría" required>
+                    </div>
+                </div>
+                <button type="submit">Agregar Producto</button>
+            </form>
+            <div id="resultado-17"></div>
+        </div>
+
+        <!-- SECCIÓN EJERCICIO 18 -->
+        <div id="ejercicio18" class="section">
+            <h1>🔒 Ejercicio 18: Verificar Error de Privilegios</h1>
+            
+            <div class="warning result">
+                <h3>⚠️ Instrucciones:</h3>
+                <p>1. Primero obtén los comandos para cambiar permisos del usuario en MongoDB</p>
+                <p>2. Ejecuta los comandos en MongoDB Compass</p>
+                <p>3. Luego intenta insertar un producto para verificar el error</p>
+            </div>
+
+            <h3>Paso 1: Obtener comandos MongoDB</h3>
+            <button onclick="obtenerComandos()" class="btn-secondary">Ver Comandos de MongoDB</button>
+            <div id="comandos-mongo"></div>
+
+            <h3>Paso 2: Intentar insertar producto</h3>
+            <form id="form-test-permisos">
+                <div class="form-row">
+                    <div>
+                        <input type="text" id="nombre-test" placeholder="Nombre del producto" required>
+                    </div>
+                    <div>
+                        <input type="number" id="precio-test" placeholder="Precio" step="0.01" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-danger">Intentar Agregar (debería fallar)</button>
+            </form>
+            <div id="resultado-18"></div>
+        </div>
+
+        <!-- SECCIÓN EJERCICIO 19 -->
+        <div id="ejercicio19" class="section">
+            <h1>📋 Ejercicio 19: Consultar Productos</h1>
+            <div class="info result">
+                <p><strong>Objetivo:</strong> Obtener y visualizar todos los productos de la base de datos 'inventario'.</p>
+            </div>
+            
+            <button onclick="listarProductos()" class="btn-success">📋 Listar Todos los Productos</button>
+            <button onclick="agregarProductoEjemplo()" class="btn-secondary">➕ Agregar Producto de Ejemplo</button>
+            
+            <div id="resultado-19"></div>
+        </div>
+
+        <!-- SECCIÓN GESTIÓN DE USUARIOS -->
+        <div id="gestion" class="section">
+            <h1>👥 Gestión de Usuarios</h1>
+            <div class="info result">
+                <p><strong>Base de datos:</strong> gestionUsuarios | <strong>Usuario:</strong> escritura (readWrite)</p>
+            </div>
+            
+            <form id="form-usuario">
+                <div>
+                    <input type="text" id="nombre-usuario" placeholder="Nombre del usuario" required>
+                    <button type="submit">Agregar Usuario</button>
+                </div>
+            </form>
+            
+            <div id="resultado-gestion"></div>
+            
+            <h3>👥 Lista de Usuarios</h3>
+            <button onclick="cargarUsuarios()" class="btn-secondary">🔄 Actualizar Lista</button>
+            <div id="lista-usuarios"></div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarSeccion(seccion) {
+            // Ocultar todas las secciones
+            var secciones = document.querySelectorAll('.section');
+            for (var i = 0; i < secciones.length; i++) {
+                secciones[i].classList.remove('active');
+            }
+            
+            var botones = document.querySelectorAll('.navbar button');
+            for (var i = 0; i < botones.length; i++) {
+                botones[i].classList.remove('active');
+            }
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(seccion).classList.add('active');
+            document.getElementById('btn-' + seccion).classList.add('active');
+            
+            // Cargar datos específicos
+            if (seccion === 'ejercicio19') {
+                listarProductos();
+            } else if (seccion === 'gestion') {
+                cargarUsuarios();
+            }
+        }
+
+        function probarConexiones() {
+            fetch('/test-connection')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    var html = '<div class="result info"><h3>🔗 Resultados de Conexión:</h3>';
+                    for (var db in result) {
+                        html += '<p><strong>' + db + ':</strong> ' + result[db] + '</p>';
+                    }
+                    html += '</div>';
+                    document.getElementById('resultado-test').innerHTML = html;
+                })
+                .catch(function(error) {
+                    document.getElementById('resultado-test').innerHTML = 
+                        '<div class="result error">❌ Error de conexión: ' + error.message + '</div>';
+                });
+        }
+
+        document.getElementById('form-producto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var producto = {
+                nombre: document.getElementById('nombre-producto').value,
+                precio: parseFloat(document.getElementById('precio-producto').value),
+                stock: parseInt(document.getElementById('stock-producto').value),
+                categoria: document.getElementById('categoria-producto').value
+            };
+
+            fetch('/agregar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                var resultDiv = document.getElementById('resultado-17');
+                if (result.mensaje) {
+                    resultDiv.innerHTML = '<div class="result success">✅ ' + result.mensaje + '<br>ID: ' + result.insertado_id + '</div>';
+                    document.getElementById('form-producto').reset();
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ ' + result.error + '</div>';
+                }
+            })
+            .catch(function(error) {
+                document.getElementById('resultado-17').innerHTML = 
+                    '<div class="result error">❌ Error: ' + error.message + '</div>';
+            });
+        });
+
+        function obtenerComandos() {
+            fetch('/cambiar-permisos-usuario', { method: 'POST' })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    document.getElementById('comandos-mongo').innerHTML = 
+                        '<div class="result warning">' +
+                        '<h4>' + result.mensaje + '</h4>' +
+                        '<pre>' + result.comando_mongodb + '</pre>' +
+                        '<h4>Para restaurar permisos:</h4>' +
+                        '<pre>' + result.para_restaurar + '</pre>' +
+                        '</div>';
+                });
+        }
+
+        document.getElementById('form-test-permisos').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var producto = {
+                nombre: document.getElementById('nombre-test').value,
+                precio: parseFloat(document.getElementById('precio-test').value),
+                stock: 1,
+                categoria: 'Test'
+            };
+
+            fetch('/agregar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                var resultDiv = document.getElementById('resultado-18');
+                if (result.mensaje) {
+                    resultDiv.innerHTML = '<div class="result success">✅ ' + result.mensaje + ' (Los permisos AÚN permiten escritura)</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ ' + result.error + '<br><strong>¡Perfecto! Este error confirma que los permisos fueron cambiados.</strong></div>';
+                }
+            });
+        });
+
+        function listarProductos() {
+            fetch('/listar')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    var html = '<div class="result success">';
+                    html += '<h3>✅ ' + result.mensaje + '</h3>';
+                    html += '<p><strong>Total:</strong> ' + result.total + '</p>';
+                    
+                    if (result.productos.length > 0) {
+                        html += '<table><tr><th>Nombre</th><th>Precio</th><th>Stock</th><th>Categoría</th></tr>';
+                        for (var i = 0; i < result.productos.length; i++) {
+                            var p = result.productos[i];
+                            html += '<tr>';
+                            html += '<td>' + (p.nombre || 'N/A') + '</td>';
+                            html += '<td>$' + (p.precio || 'N/A') + '</td>';
+                            html += '<td>' + (p.stock || 'N/A') + '</td>';
+                            html += '<td>' + (p.categoria || 'N/A') + '</td>';
+                            html += '</tr>';
+                        }
+                        html += '</table>';
+                    } else {
+                        html += '<p class="empty">No hay productos.</p>';
+                    }
+                    html += '</div>';
+                    document.getElementById('resultado-19').innerHTML = html;
+                });
+        }
+
+        function agregarProductoEjemplo() {
+            var productos = [
+                { nombre: "Laptop Dell", precio: 899.99, stock: 10, categoria: "Tecnología" },
+                { nombre: "Mouse", precio: 25.50, stock: 50, categoria: "Accesorios" }
+            ];
+            
+            var producto = productos[Math.floor(Math.random() * productos.length)];
+
+            fetch('/agregar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto)
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert('✅ Producto agregado: ' + producto.nombre);
+                    listarProductos();
+                } else {
+                    alert('❌ Error al agregar producto');
+                }
+            });
+        }
+
+        document.getElementById('form-usuario').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var nombre = document.getElementById('nombre-usuario').value;
+
+            fetch('/gestion-usuarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre: nombre })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                var resultDiv = document.getElementById('resultado-gestion');
+                if (result.success) {
+                    resultDiv.innerHTML = '<div class="result success">✅ ' + result.mensaje + '</div>';
+                    document.getElementById('form-usuario').reset();
+                    cargarUsuarios();
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">❌ ' + result.error + '</div>';
+                }
+            });
+        });
+
+        function cargarUsuarios() {
+            fetch('/gestion-usuarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'listar' })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(result) {
+                var html = '<div class="result info">';
+                html += '<h4>👥 Total: ' + result.total + '</h4>';
+                
+                if (result.usuarios.length > 0) {
+                    html += '<table><tr><th>Nombre</th><th>Fecha</th></tr>';
+                    for (var i = 0; i < result.usuarios.length; i++) {
+                        var u = result.usuarios[i];
+                        html += '<tr>';
+                        html += '<td>👤 ' + (u.nombre || 'Sin nombre') + '</td>';
+                        html += '<td>' + (u.fecha_creacion || 'Sin fecha') + '</td>';
+                        html += '</tr>';
+                    }
+                    html += '</table>';
+                } else {
+                    html += '<p class="empty">No hay usuarios.</p>';
+                }
+                
+                html += '</div>';
+                document.getElementById('lista-usuarios').innerHTML = html;
+            });
+        }
+    </script>
+</body>
+</html>
